@@ -7,4 +7,5 @@ public interface IPessoaRepository : IGenericRepository
 {
     Task<Pessoa> GetPessoaById(Guid id);
     Task<List<Pessoa>> GetPessoas();
+    Task<List<Pessoa>> GetTotalByPessoas();
 }

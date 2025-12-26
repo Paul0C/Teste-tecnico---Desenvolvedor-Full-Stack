@@ -9,4 +9,5 @@ public interface IPessoaService
     Task<Result<bool>> DeletePessoa(Guid id);
     Task<Result<PessoaDto>> GetPessoaById(Guid id);
     Task<Result<List<PessoaDto>>> GetPessoas();
+    Task<Result<TotalPessoasDto>> GetTotalByPessoas();
 }

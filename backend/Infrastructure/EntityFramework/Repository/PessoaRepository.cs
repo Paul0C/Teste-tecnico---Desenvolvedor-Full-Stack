@@ -18,4 +18,11 @@ public class PessoaRepository(DataContext context) : GenericRepository(context),
     {
         return await _context.Pessoas.AsNoTracking().ToListAsync();
     }
+
+    public async Task<List<Pessoa>> GetTotalByPessoas()
+    {
+        return await _context.Pessoas
+            .AsNoTracking()
+            .ToListAsync();
+    }
 }

@@ -1,5 +1,5 @@
 using backend.Infrastructure.EntityFramework.Repository.Interface;
-using Domain.Entities;
+using backend.Domain.Entities;
 using Infrastructure.EntityFramework.DataContext;
 using Microsoft.EntityFrameworkCore;
 

@@ -6,5 +6,5 @@ public class CategoriaDto
 {
     public Guid Id { get; set; }
     public string Descricao { get; set; }
-    public FinalidadeCategoria Finalidade { get; set; }
+    public string Finalidade { get; set; }
 }

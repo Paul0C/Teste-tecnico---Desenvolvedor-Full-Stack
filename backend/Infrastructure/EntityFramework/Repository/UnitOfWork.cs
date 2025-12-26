@@ -1,8 +1,9 @@
+using backend.Infrastructure.EntityFramework.Repository.Interface;
 using Infrastructure.EntityFramework.DataContext;
 
 namespace backend.Infrastructure.EntityFramework.Repository;
  
-public class UnitOfWork(DataContext context)
+public class UnitOfWork(DataContext context) : IUnitOfWork
 {
     private readonly DataContext _context = context;
 

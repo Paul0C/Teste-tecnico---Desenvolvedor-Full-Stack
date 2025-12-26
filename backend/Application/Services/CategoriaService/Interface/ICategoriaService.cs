@@ -8,4 +8,5 @@ public interface ICategoriaService
     Task<Result<CategoriaDto>> CreateCategoria(CategoriaDto categoriaDto);
     Task<Result<CategoriaDto>> GetCategoriaById(Guid id);
     Task<Result<List<CategoriaDto>>> GetCategorias();
+    Task<Result<TotalCategoriasDto>> GetTotalByCategorias();
 }

@@ -1,16 +1,14 @@
 namespace Infrastructure.EntityFramework.DataContext;
-using Domain.Entities;
+
+using backend.Domain.Entities;
+
 using Microsoft.EntityFrameworkCore;
 
-public class DataContext : DbContext
+public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
     public DbSet<Transacao> Transacoes { get; set; }
     public DbSet<Categoria> Categorias { get; set; }
     public DbSet<Pessoa> Pessoas { get; set; }
-
-    public DataContext(DbContextOptions<DataContext> options) : base(options)
-    {
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,12 +19,12 @@ public class DataContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Descricao).IsRequired();
-            entity.Property(e => e.Valor).IsRequired();
+            entity.Property(e => e.Valor).HasPrecision(18, 2).IsRequired();
             entity.HasOne(e => e.Categoria)
-                  .WithMany()
+                  .WithMany(c => c.Transacoes)
                   .HasForeignKey(e => e.CategoriaId);
             entity.HasOne(e => e.Pessoa)
-                  .WithMany()
+                  .WithMany(p => p.Transacoes)
                   .HasForeignKey(e => e.PessoaId)
                   .OnDelete(DeleteBehavior.Cascade);
         });

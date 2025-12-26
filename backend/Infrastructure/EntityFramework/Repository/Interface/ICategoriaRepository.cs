@@ -1,5 +1,5 @@
 using Backend.Infrastructure.EntityFramework.Repository.Interface;
-using Domain.Entities;
+using backend.Domain.Entities;
 
 namespace backend.Infrastructure.EntityFramework.Repository.Interface;
 

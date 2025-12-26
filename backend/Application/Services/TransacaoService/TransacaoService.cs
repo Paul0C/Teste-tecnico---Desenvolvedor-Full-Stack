@@ -19,12 +19,15 @@ public class TransacaoService (ITransacaoRepository transacaoRepository, IPessoa
         if(pessoa == null)
             return Result<TransacaoDto>.Failure("Pessoa não encontrada");
 
-        if(pessoa.Idade < 18 && transacaoDto.Finalidade == FinalidadeCategoria.Receita)
+        if(pessoa.Idade < 18 && Enum.Parse<FinalidadeCategoria>(transacaoDto.Finalidade) == FinalidadeCategoria.Receita)
             return Result<TransacaoDto>.Failure("Pessoa menor de idade não pode realizar receitas.");
 
         var categoria = await _categoriaRepository.GetCategoriaById(transacaoDto.CategoriaId);
         if(categoria == null)
             return Result<TransacaoDto>.Failure("Categoria não encontrada");
+
+        if(categoria.Finalidade != FinalidadeCategoria.Ambas && categoria.Finalidade != Enum.Parse<FinalidadeCategoria>(transacaoDto.Finalidade))
+            return Result<TransacaoDto>.Failure("Categoria não compatível com a finalidade da transação.");
 
         var transacao = new Transacao
         {
@@ -32,20 +35,52 @@ public class TransacaoService (ITransacaoRepository transacaoRepository, IPessoa
             CategoriaId = transacaoDto.CategoriaId,
             PessoaId = transacaoDto.PessoaId,
             Descricao = transacaoDto.Descricao,
-            Finalidade = transacaoDto.Finalidade
+            Finalidade = Enum.Parse<FinalidadeCategoria>(transacaoDto.Finalidade)
         };
         _transacaoRepository.Add(transacao);
         await _unitOfWork.SaveChangesAsync();
         return Result<TransacaoDto>.Success(transacaoDto);
     }
 
-    public Task<Result<TransacaoDto>> GetTransacaoById(Guid id)
+    public async Task<Result<TransacaoDto>> GetTransacaoById(Guid id)
     {
-        throw new NotImplementedException();
+        var transacao = await _transacaoRepository.GetTransacaoById(id);
+        if (transacao == null)
+            return Result<TransacaoDto>.Failure("Transação não encontrada.");
+
+        var transacaoDto = new TransacaoDto
+        {
+            Id = transacao.Id,
+            Valor = transacao.Valor,
+            CategoriaId = transacao.CategoriaId,
+            DescricaoCategoria = transacao.Categoria.Descricao,
+            PessoaId = transacao.PessoaId,
+            PessoaNome = transacao.Pessoa.Nome,
+            Descricao = transacao.Descricao,
+            Finalidade = transacao.Finalidade.ToString()
+        };
+
+        return Result<TransacaoDto>.Success(transacaoDto);
     }
 
-    public Task<Result<List<TransacaoDto>>> GetTransacoes()
+    public async Task<Result<List<TransacaoDto>>> GetTransacoes()
     {
-        throw new NotImplementedException();
+        var transacoes = await _transacaoRepository.GetTransacoes();
+        if (transacoes == null)
+            return Result<List<TransacaoDto>>.Failure("Nenhuma transação encontrada.");
+
+        var transacoesDto = transacoes.Select(transacao => new TransacaoDto
+        {
+            Id = transacao.Id,
+            Valor = transacao.Valor,
+            CategoriaId = transacao.CategoriaId,
+            DescricaoCategoria = transacao.Categoria.Descricao,
+            PessoaId = transacao.PessoaId,
+            PessoaNome = transacao.Pessoa.Nome,
+            Descricao = transacao.Descricao,
+            Finalidade = transacao.Finalidade.ToString()
+        }).ToList();
+
+        return Result<List<TransacaoDto>>.Success(transacoesDto);
     }
 }

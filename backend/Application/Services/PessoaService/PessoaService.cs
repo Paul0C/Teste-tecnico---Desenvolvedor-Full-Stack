@@ -3,6 +3,7 @@ using backend.Application.Services.PessoaService.Interface;
 using backend.Application.Shared.Results;
 using backend.Infrastructure.EntityFramework.Repository.Interface;
 using backend.Domain.Entities;
+using Domain.Enums;
 
 namespace backend.Application.Services.PessoaService;
 
@@ -71,5 +72,29 @@ public class PessoaService (IPessoaRepository pessoaRepository, IUnitOfWork unit
         }).ToList();
 
         return Result<List<PessoaDto>>.Success(pessoasDto);
+    }
+
+    public async Task<Result<TotalPessoasDto>> GetTotalByPessoas()
+    {
+        var pessoas = await _pessoaRepository.GetTotalByPessoas();
+        if (pessoas == null)
+            return Result<TotalPessoasDto>.Failure("Nenhuma pessoa encontrada.");
+            
+        var pessoasDto = pessoas.Select(pessoa => new TotalPessoaDto
+        {
+            Id = pessoa.Id,
+            Nome = pessoa.Nome,
+            TotalReceita = pessoa.Transacoes.Where(t => t.Finalidade == FinalidadeCategoria.Receita).Sum(t => t.Valor),
+            TotalDespesa = pessoa.Transacoes.Where(t => t.Finalidade == FinalidadeCategoria.Despesa).Sum(t => t.Valor)
+        }).ToList();
+
+        var totalPessoasDto = new TotalPessoasDto
+        {
+            PessoasTotais = pessoasDto,
+            TotalReceita = pessoasDto.Sum(p => p.TotalReceita),
+            TotalDespesa = pessoasDto.Sum(p => p.TotalDespesa)
+        };
+
+        return Result<TotalPessoasDto>.Success(totalPessoasDto);
     }
 }
